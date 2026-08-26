@@ -1,159 +1,1229 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
   <title>WalkBuddy Helper</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
+    * {
+      box-sizing: border-box;
     }
 
-    input, button {
-      padding: 12px;
-      margin: 8px;
-      font-size: 16px;
+    body {
+      margin: 0;
+      background: #0b0b0b;
+      color: #ffffff;
+      font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      min-height: 100vh;
+      overflow-x: hidden;
     }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------------- HEADER ---------------- */
+
+    .header {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 28px;
+
+      background: #121212;
+      border-bottom: 1px solid #262626;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: #9d9d9d;
+      margin-top: 3px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      padding: 9px 14px;
+
+      background: #1d1d1d;
+      border-radius: 999px;
+
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+
+      border-radius: 50%;
+
+      background: #777;
+    }
+
+    .status-dot.connected {
+      background: #21c55d;
+    }
+
+    /* ---------------- MAIN ---------------- */
+
+    .main {
+      flex: 1;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 24px;
+    }
+
+    .call-layout {
+      position: relative;
+
+      width: 100%;
+      max-width: 1100px;
+
+      height: calc(100vh - 150px);
+      min-height: 560px;
+
+      background: #161616;
+
+      border-radius: 22px;
+      overflow: hidden;
+
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    /* ---------------- REMOTE VIDEO ---------------- */
 
     #remote-player {
-      width: 80%;
-      max-width: 800px;
-      height: 500px;
-      margin: 20px auto;
-      background: black;
+      width: 100%;
+      height: 100%;
+
+      background: #000;
+    }
+
+    .remote-placeholder {
+      position: absolute;
+
+      inset: 0;
+
+      display: flex;
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      pointer-events: none;
+    }
+
+    .remote-placeholder-icon {
+      width: 100px;
+      height: 100px;
+
+      border-radius: 50%;
+
+      background: #252525;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 45px;
+    }
+
+    .remote-placeholder-text {
+      margin-top: 18px;
+
+      color: #b8b8b8;
+      font-size: 18px;
+    }
+
+    /* ---------------- USER LABEL ---------------- */
+
+    .remote-label {
+      position: absolute;
+
+      top: 20px;
+      left: 20px;
+
+      background: rgba(0, 0, 0, 0.6);
+
+      padding: 9px 14px;
+
+      border-radius: 10px;
+
+      backdrop-filter: blur(8px);
+
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    /* ---------------- LOCAL SELF VIEW ---------------- */
+
+    .local-container {
+      position: absolute;
+
+      right: 22px;
+      bottom: 110px;
+
+      width: 220px;
+      height: 150px;
+
+      background: #222;
+
+      border-radius: 16px;
+
+      overflow: hidden;
+
+      border: 2px solid rgba(255, 255, 255, 0.18);
+
+      box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.5);
     }
 
     #local-player {
-      width: 300px;
-      height: 200px;
-      margin: 20px auto;
-      background: black;
+      width: 100%;
+      height: 100%;
     }
+
+    .local-label {
+      position: absolute;
+
+      bottom: 7px;
+      left: 8px;
+
+      background: rgba(0, 0, 0, 0.6);
+
+      padding: 5px 8px;
+
+      border-radius: 7px;
+
+      font-size: 11px;
+    }
+
+    /* ---------------- CALL CONTROLS ---------------- */
+
+    .controls-container {
+      position: absolute;
+
+      bottom: 24px;
+      left: 50%;
+
+      transform: translateX(-50%);
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 22px;
+
+      padding: 14px 22px;
+
+      background: rgba(20, 20, 20, 0.86);
+
+      border-radius: 50px;
+
+      backdrop-filter: blur(14px);
+
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 5px;
+    }
+
+    .control-button {
+      width: 58px;
+      height: 58px;
+
+      border: none;
+      border-radius: 50%;
+
+      background: #373737;
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      cursor: pointer;
+
+      font-size: 25px;
+
+      transition:
+        background 0.15s,
+        transform 0.15s;
+    }
+
+    .control-button:hover {
+      background: #4a4a4a;
+      transform: scale(1.05);
+    }
+
+    .control-button:active {
+      transform: scale(0.96);
+    }
+
+    .control-button.active {
+      background: #555;
+    }
+
+    .control-button.end {
+      background: #d32f2f;
+    }
+
+    .control-button.end:hover {
+      background: #eb3e3e;
+    }
+
+    .control-label {
+      font-size: 11px;
+      color: #ddd;
+    }
+
+    /* ---------------- JOIN SCREEN ---------------- */
+
+    .join-overlay {
+      position: fixed;
+
+      inset: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #0b0b0b;
+
+      z-index: 10;
+    }
+
+    .join-card {
+      width: min(440px, 90%);
+
+      background: #171717;
+
+      padding: 34px;
+
+      border-radius: 22px;
+
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .join-card h1 {
+      margin-top: 0;
+
+      font-size: 30px;
+    }
+
+    .join-card p {
+      color: #aaa;
+
+      line-height: 1.5;
+
+      margin-bottom: 25px;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+
+      font-size: 13px;
+
+      margin-bottom: 7px;
+
+      color: #bbb;
+    }
+
+    .field input {
+      width: 100%;
+
+      padding: 13px 14px;
+
+      border-radius: 9px;
+
+      border: 1px solid #343434;
+
+      background: #222;
+
+      color: white;
+
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: #2589da;
+    }
+
+    .join-button {
+      width: 100%;
+
+      margin-top: 8px;
+
+      padding: 14px;
+
+      border: none;
+      border-radius: 10px;
+
+      background: #2589da;
+      color: white;
+
+      font-size: 16px;
+      font-weight: 600;
+
+      cursor: pointer;
+    }
+
+    .join-button:hover {
+      background: #3299e8;
+    }
+
+    .error {
+      margin-top: 15px;
+
+      color: #ff6b6b;
+
+      font-size: 13px;
+    }
+
+    /* ---------------- RESPONSIVE ---------------- */
+
+    @media (max-width: 700px) {
+
+      .header {
+        padding: 0 16px;
+      }
+
+      .brand-title {
+        font-size: 19px;
+      }
+
+      .main {
+        padding: 10px;
+      }
+
+      .call-layout {
+        height: calc(100vh - 100px);
+
+        border-radius: 12px;
+      }
+
+      .local-container {
+        width: 140px;
+        height: 100px;
+
+        right: 12px;
+        bottom: 105px;
+      }
+
+      .controls-container {
+        gap: 12px;
+
+        bottom: 18px;
+
+        padding: 11px 15px;
+      }
+
+      .control-button {
+        width: 52px;
+        height: 52px;
+      }
+    }
+
   </style>
 </head>
 
 <body>
-  <h1>WalkBuddy Helper</h1>
 
-  <input id="appId" placeholder="Agora App ID" />
-  <input id="token" placeholder="Temporary Token" />
+<div class="app">
 
-  <br />
+  <!-- HEADER -->
 
-  <button onclick="joinCall()">Join Call</button>
-  <button onclick="leaveCall()">Leave Call</button>
+  <header class="header">
 
-  <p id="status">Not connected</p>
+    <div class="brand">
+      <div class="brand-title">
+        WalkBuddy Helper
+      </div>
 
-  <h2>WalkBuddy User</h2>
-  <div id="remote-player"></div>
+      <div class="brand-subtitle">
+        Remote visual assistance
+      </div>
+    </div>
 
-  <h2>Helper Camera</h2>
-  <div id="local-player"></div>
 
-  <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.23.4.js"></script>
+    <div class="status-badge">
 
-  <script>
-    const CHANNEL = "test-walkbuddy";
+      <div
+        id="statusDot"
+        class="status-dot">
+      </div>
 
-    let client;
-    let localAudioTrack;
-    let localVideoTrack;
+      <span id="statusText">
+        Not connected
+      </span>
 
-    async function joinCall() {
-      const appId = document.getElementById("appId").value.trim();
-      const token = document.getElementById("token").value.trim();
+    </div>
 
-      const status = document.getElementById("status");
+  </header>
 
-      try {
-        status.innerText = "Joining...";
 
-        client = AgoraRTC.createClient({
-          mode: "rtc",
-          codec: "vp8"
-        });
+  <!-- MAIN CALL -->
 
-        client.on("user-published", async (user, mediaType) => {
-          await client.subscribe(user, mediaType);
+  <main class="main">
 
-          console.log("Remote user published:", user.uid, mediaType);
+    <div class="call-layout">
 
-          if (mediaType === "video") {
-            user.videoTrack.play("remote-player");
-          }
+      <!-- REMOTE VIDEO -->
 
-          if (mediaType === "audio") {
-            user.audioTrack.play();
-          }
-        });
+      <div id="remote-player"></div>
 
-        client.on("user-unpublished", (user, mediaType) => {
-          console.log("Remote user unpublished:", user.uid, mediaType);
-        });
 
-        client.on("user-left", (user) => {
-          console.log("Remote user left:", user.uid);
-          status.innerText = "WalkBuddy user disconnected";
-        });
+      <div
+        id="remotePlaceholder"
+        class="remote-placeholder">
 
-        await client.join(
-          appId,
-          CHANNEL,
-          token,
-          2
+        <div class="remote-placeholder-icon">
+          👤
+        </div>
+
+        <div class="remote-placeholder-text">
+          Waiting for WalkBuddy user...
+        </div>
+
+      </div>
+
+
+      <div class="remote-label">
+        WalkBuddy User
+      </div>
+
+
+      <!-- HELPER SELF VIEW -->
+
+      <div class="local-container">
+
+        <div id="local-player"></div>
+
+        <div class="local-label">
+          You
+        </div>
+
+      </div>
+
+
+      <!-- CALL CONTROLS -->
+
+      <div class="controls-container">
+
+        <!-- MIC -->
+
+        <div class="control-group">
+
+          <button
+            id="muteButton"
+            class="control-button"
+            onclick="toggleMute()"
+            title="Mute microphone">
+
+            🎙️
+
+          </button>
+
+          <div
+            id="muteLabel"
+            class="control-label">
+
+            Mute
+
+          </div>
+
+        </div>
+
+
+        <!-- SWITCH CAMERA -->
+
+        <div class="control-group">
+
+          <button
+            class="control-button"
+            onclick="switchCamera()"
+            title="Switch camera">
+
+            🔄
+
+          </button>
+
+          <div class="control-label">
+            Camera
+          </div>
+
+        </div>
+
+
+        <!-- END CALL -->
+
+        <div class="control-group">
+
+          <button
+            class="control-button end"
+            onclick="leaveCall()"
+            title="End call">
+
+            📞
+
+          </button>
+
+          <div class="control-label">
+            End
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+<!-- JOIN SCREEN -->
+
+<div
+  id="joinOverlay"
+  class="join-overlay">
+
+  <div class="join-card">
+
+    <h1>
+      Join WalkBuddy Call
+    </h1>
+
+    <p>
+      Connect to a WalkBuddy user and provide
+      real-time visual assistance.
+    </p>
+
+
+    <div class="field">
+
+      <label>
+        Agora App ID
+      </label>
+
+      <input
+        id="appId"
+        type="text"
+        placeholder="Enter App ID"
+      />
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Temporary Token
+      </label>
+
+      <input
+        id="token"
+        type="text"
+        placeholder="Enter temporary token"
+      />
+
+    </div>
+
+
+    <button
+      class="join-button"
+      onclick="joinCall()">
+
+      Join Assistance Call
+
+    </button>
+
+
+    <div
+      id="joinError"
+      class="error">
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- AGORA -->
+
+<script
+  src="https://download.agora.io/sdk/release/AgoraRTC_N-4.23.4.js">
+</script>
+
+
+<script>
+
+const CHANNEL = "test-walkbuddy";
+
+let client = null;
+
+let localAudioTrack = null;
+let localVideoTrack = null;
+
+let helperMuted = false;
+
+
+/* ------------------------------------------------
+   STATUS
+------------------------------------------------ */
+
+function setStatus(text, connected = false) {
+
+  document.getElementById(
+    "statusText"
+  ).innerText = text;
+
+
+  const dot =
+    document.getElementById(
+      "statusDot"
+    );
+
+
+  if (connected) {
+
+    dot.classList.add(
+      "connected"
+    );
+
+  } else {
+
+    dot.classList.remove(
+      "connected"
+    );
+
+  }
+}
+
+
+/* ------------------------------------------------
+   JOIN
+------------------------------------------------ */
+
+async function joinCall() {
+
+  const appId =
+    document
+      .getElementById("appId")
+      .value
+      .trim();
+
+
+  const token =
+    document
+      .getElementById("token")
+      .value
+      .trim();
+
+
+  const errorBox =
+    document.getElementById(
+      "joinError"
+    );
+
+
+  errorBox.innerText = "";
+
+
+  if (!appId || !token) {
+
+    errorBox.innerText =
+      "App ID and token are required.";
+
+    return;
+
+  }
+
+
+  try {
+
+    setStatus(
+      "Connecting..."
+    );
+
+
+    client =
+      AgoraRTC.createClient({
+
+        mode: "rtc",
+
+        codec: "vp8"
+
+      });
+
+
+    /* ---------------- REMOTE USER ---------------- */
+
+
+    client.on(
+      "user-published",
+      async (user, mediaType) => {
+
+        console.log(
+          "Remote user published:",
+          user.uid,
+          mediaType
         );
 
-        status.innerText = "Joined channel";
 
-        [localAudioTrack, localVideoTrack] =
-          await AgoraRTC.createMicrophoneAndCameraTracks();
+        await client.subscribe(
+          user,
+          mediaType
+        );
 
-        localVideoTrack.play("local-player");
 
-        await client.publish([
-          localAudioTrack,
-          localVideoTrack
-        ]);
+        if (
+          mediaType === "video"
+        ) {
 
-        status.innerText = "Connected";
+          document
+            .getElementById(
+              "remotePlaceholder"
+            )
+            .style
+            .display = "none";
+
+
+          user
+            .videoTrack
+            .play(
+              "remote-player"
+            );
+
+        }
+
+
+        if (
+          mediaType === "audio"
+        ) {
+
+          user
+            .audioTrack
+            .play();
+
+        }
+
       }
-      catch (error) {
-        console.error(error);
-        status.innerText =
-          "Error: " + (error.message || error);
+    );
+
+
+    client.on(
+      "user-unpublished",
+      (
+        user,
+        mediaType
+      ) => {
+
+        console.log(
+          "Remote user unpublished:",
+          user.uid,
+          mediaType
+        );
+
       }
+    );
+
+
+    client.on(
+      "user-left",
+      (user) => {
+
+        console.log(
+          "WalkBuddy user left:",
+          user.uid
+        );
+
+
+        document
+          .getElementById(
+            "remotePlaceholder"
+          )
+          .style
+          .display = "flex";
+
+
+        setStatus(
+          "WalkBuddy user disconnected",
+          false
+        );
+
+      }
+    );
+
+
+    /* ---------------- JOIN CHANNEL ---------------- */
+
+
+    await client.join(
+      appId,
+      CHANNEL,
+      token,
+      2
+    );
+
+
+    console.log(
+      "Helper joined Agora channel"
+    );
+
+
+    /* ---------------- HELPER MEDIA ---------------- */
+
+
+    [
+      localAudioTrack,
+      localVideoTrack
+    ] =
+      await AgoraRTC
+        .createMicrophoneAndCameraTracks();
+
+
+    localVideoTrack.play(
+      "local-player"
+    );
+
+
+    await client.publish([
+      localAudioTrack,
+      localVideoTrack
+    ]);
+
+
+    /* ---------------- UI ---------------- */
+
+
+    document
+      .getElementById(
+        "joinOverlay"
+      )
+      .style
+      .display = "none";
+
+
+    setStatus(
+      "Connected",
+      true
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "JOIN ERROR:",
+      error
+    );
+
+
+    errorBox.innerText =
+      error.message ||
+      String(error);
+
+
+    setStatus(
+      "Connection failed",
+      false
+    );
+
+  }
+
+}
+
+
+/* ------------------------------------------------
+   MUTE
+------------------------------------------------ */
+
+async function toggleMute() {
+
+  if (!localAudioTrack) {
+
+    return;
+
+  }
+
+
+  helperMuted =
+    !helperMuted;
+
+
+  await localAudioTrack
+    .setEnabled(
+      !helperMuted
+    );
+
+
+  const button =
+    document.getElementById(
+      "muteButton"
+    );
+
+
+  const label =
+    document.getElementById(
+      "muteLabel"
+    );
+
+
+  if (helperMuted) {
+
+    button.innerText =
+      "🔇";
+
+    button.classList.add(
+      "active"
+    );
+
+    button.title =
+      "Unmute microphone";
+
+
+    label.innerText =
+      "Unmute";
+
+
+  } else {
+
+    button.innerText =
+      "🎙️";
+
+    button.classList.remove(
+      "active"
+    );
+
+    button.title =
+      "Mute microphone";
+
+
+    label.innerText =
+      "Mute";
+
+  }
+
+}
+
+
+/* ------------------------------------------------
+   SWITCH CAMERA
+------------------------------------------------ */
+
+async function switchCamera() {
+
+  if (!localVideoTrack) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const cameras =
+      await AgoraRTC.getCameras();
+
+
+    if (
+      cameras.length < 2
+    ) {
+
+      console.log(
+        "Only one camera available"
+      );
+
+      return;
+
     }
 
-    async function leaveCall() {
-      try {
-        if (localAudioTrack) {
-          localAudioTrack.stop();
-          localAudioTrack.close();
-        }
 
-        if (localVideoTrack) {
-          localVideoTrack.stop();
-          localVideoTrack.close();
-        }
+    const currentLabel =
+      localVideoTrack
+        .getTrackLabel();
 
-        if (client) {
-          await client.leave();
-        }
 
-        document.getElementById("status").innerText =
-          "Disconnected";
-      }
-      catch (error) {
-        console.error(error);
-      }
+    const nextCamera =
+      cameras.find(
+        camera =>
+          camera.label !==
+          currentLabel
+      );
+
+
+    if (
+      nextCamera
+    ) {
+
+      await localVideoTrack
+        .setDevice(
+          nextCamera.deviceId
+        );
+
+
+      console.log(
+        "Helper camera switched"
+      );
+
     }
-  </script>
+
+  } catch (error) {
+
+    console.error(
+      "CAMERA SWITCH ERROR:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ------------------------------------------------
+   LEAVE
+------------------------------------------------ */
+
+async function leaveCall() {
+
+  try {
+
+    if (
+      localAudioTrack
+    ) {
+
+      localAudioTrack.stop();
+
+      localAudioTrack.close();
+
+      localAudioTrack = null;
+
+    }
+
+
+    if (
+      localVideoTrack
+    ) {
+
+      localVideoTrack.stop();
+
+      localVideoTrack.close();
+
+      localVideoTrack = null;
+
+    }
+
+
+    if (
+      client
+    ) {
+
+      await client.leave();
+
+      client = null;
+
+    }
+
+
+    helperMuted =
+      false;
+
+
+    document
+      .getElementById(
+        "remotePlaceholder"
+      )
+      .style
+      .display = "flex";
+
+
+    document
+      .getElementById(
+        "joinOverlay"
+      )
+      .style
+      .display = "flex";
+
+
+    setStatus(
+      "Not connected",
+      false
+    );
+
+
+    document
+      .getElementById(
+        "muteButton"
+      )
+      .innerText =
+        "🎙️";
+
+
+    document
+      .getElementById(
+        "muteLabel"
+      )
+      .innerText =
+        "Mute";
+
+
+  } catch (error) {
+
+    console.error(
+      "LEAVE ERROR:",
+      error
+    );
+
+  }
+
+}
+
+</script>
+
 </body>
 </html>
