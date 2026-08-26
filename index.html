@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Camera Test</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      text-align: center;
+    }
+
+    button {
+      padding: 16px 24px;
+      font-size: 18px;
+      margin: 20px;
+    }
+
+    video {
+      width: 90%;
+      max-width: 500px;
+      background: black;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    #status {
+      margin: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Camera + Microphone Test</h1>
+
+  <button onclick="startMedia()">
+    Start Camera and Microphone
+  </button>
+
+  <div id="status">
+    Waiting...
+  </div>
+
+  <video
+    id="video"
+    autoplay
+    playsinline
+    muted>
+  </video>
+
+  <script>
+    async function startMedia() {
+      const status = document.getElementById("status");
+      const video = document.getElementById("video");
+
+      try {
+        if (!navigator.mediaDevices) {
+          status.innerText =
+            "FAILED: navigator.mediaDevices is unavailable.";
+          return;
+        }
+
+        status.innerText = "Requesting camera and microphone...";
+
+        const stream =
+          await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+          });
+
+        video.srcObject = stream;
+
+        status.innerText =
+          "SUCCESS: Camera and microphone are working.";
+      }
+      catch (error) {
+        status.innerText =
+          "FAILED: " +
+          error.name +
+          " - " +
+          error.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
