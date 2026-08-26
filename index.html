@@ -1,95 +1,159 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Camera Test</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WalkBuddy Helper</title>
 
   <style>
     body {
-      margin: 0;
-      padding: 20px;
       font-family: Arial, sans-serif;
       background: #111;
       color: white;
       text-align: center;
+      margin: 0;
+      padding: 20px;
     }
 
-    button {
-      padding: 16px 24px;
-      font-size: 18px;
-      margin: 20px;
+    input, button {
+      padding: 12px;
+      margin: 8px;
+      font-size: 16px;
     }
 
-    video {
-      width: 90%;
-      max-width: 500px;
+    #remote-player {
+      width: 80%;
+      max-width: 800px;
+      height: 500px;
+      margin: 20px auto;
       background: black;
-      border-radius: 12px;
-      margin-top: 20px;
     }
 
-    #status {
-      margin: 20px;
-      font-size: 18px;
+    #local-player {
+      width: 300px;
+      height: 200px;
+      margin: 20px auto;
+      background: black;
     }
   </style>
 </head>
 
 <body>
+  <h1>WalkBuddy Helper</h1>
 
-  <h1>Camera + Microphone Test</h1>
+  <input id="appId" placeholder="Agora App ID" />
+  <input id="token" placeholder="Temporary Token" />
 
-  <button onclick="startMedia()">
-    Start Camera and Microphone
-  </button>
+  <br />
 
-  <div id="status">
-    Waiting...
-  </div>
+  <button onclick="joinCall()">Join Call</button>
+  <button onclick="leaveCall()">Leave Call</button>
 
-  <video
-    id="video"
-    autoplay
-    playsinline
-    muted>
-  </video>
+  <p id="status">Not connected</p>
+
+  <h2>WalkBuddy User</h2>
+  <div id="remote-player"></div>
+
+  <h2>Helper Camera</h2>
+  <div id="local-player"></div>
+
+  <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.23.4.js"></script>
 
   <script>
-    async function startMedia() {
+    const CHANNEL = "test-walkbuddy";
+
+    let client;
+    let localAudioTrack;
+    let localVideoTrack;
+
+    async function joinCall() {
+      const appId = document.getElementById("appId").value.trim();
+      const token = document.getElementById("token").value.trim();
+
       const status = document.getElementById("status");
-      const video = document.getElementById("video");
 
       try {
-        if (!navigator.mediaDevices) {
-          status.innerText =
-            "FAILED: navigator.mediaDevices is unavailable.";
-          return;
-        }
+        status.innerText = "Joining...";
 
-        status.innerText = "Requesting camera and microphone...";
+        client = AgoraRTC.createClient({
+          mode: "rtc",
+          codec: "vp8"
+        });
 
-        const stream =
-          await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false
-          });
+        client.on("user-published", async (user, mediaType) => {
+          await client.subscribe(user, mediaType);
 
-        video.srcObject = stream;
+          console.log("Remote user published:", user.uid, mediaType);
 
-        status.innerText =
-          "SUCCESS: Camera and microphone are working.";
+          if (mediaType === "video") {
+            user.videoTrack.play("remote-player");
+          }
+
+          if (mediaType === "audio") {
+            user.audioTrack.play();
+          }
+        });
+
+        client.on("user-unpublished", (user, mediaType) => {
+          console.log("Remote user unpublished:", user.uid, mediaType);
+        });
+
+        client.on("user-left", (user) => {
+          console.log("Remote user left:", user.uid);
+          status.innerText = "WalkBuddy user disconnected";
+        });
+
+        await client.join(
+          appId,
+          CHANNEL,
+          token,
+          2
+        );
+
+        status.innerText = "Joined channel";
+
+        [localAudioTrack, localVideoTrack] =
+          await AgoraRTC.createMicrophoneAndCameraTracks();
+
+        localVideoTrack.play("local-player");
+
+        await client.publish([
+          localAudioTrack,
+          localVideoTrack
+        ]);
+
+        status.innerText = "Connected";
       }
       catch (error) {
+        console.error(error);
         status.innerText =
-          "FAILED: " +
-          error.name +
-          " - " +
-          error.message;
+          "Error: " + (error.message || error);
+      }
+    }
+
+    async function leaveCall() {
+      try {
+        if (localAudioTrack) {
+          localAudioTrack.stop();
+          localAudioTrack.close();
+        }
+
+        if (localVideoTrack) {
+          localVideoTrack.stop();
+          localVideoTrack.close();
+        }
+
+        if (client) {
+          await client.leave();
+        }
+
+        document.getElementById("status").innerText =
+          "Disconnected";
+      }
+      catch (error) {
+        console.error(error);
       }
     }
   </script>
-
 </body>
 </html>
