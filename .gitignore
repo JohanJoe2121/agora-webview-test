@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+.env
+.env.*
+!.env.example
+.tools/
+.tools-test/
+cloudflared.exe
+dist/
+npm-debug.log*
+.claude/
+.vscode/settings.json
+AGENTS.md
+CLAUDE.md
