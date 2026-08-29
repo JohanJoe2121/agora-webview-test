@@ -1,34 +1,34 @@
-Agora Video Call Prototype
+#Agora Video Call Prototype
 
 A standalone proof of concept for real-time video and audio communication between an Android user and a remote helper. It was developed separately from WalkBuddy to test Agora-based calling before integrating the approach into the main accessibility project.
 
-Features
+##Features
 
-Real-time two-way audio and video
+-Real-time two-way audio and video
 
-Agora RTC channel creation and joining
+-Agora RTC channel creation and joining
 
-Secure server-side token generation
+-Secure server-side token generation
 
-Android camera and microphone permission handling
+-Android camera and microphone permission handling
 
-Join, mute, camera and leave-call controls
+-Join, mute, camera and leave-call controls
 
-Browser-based helper interface
+-Browser-based helper interface
 
-Automatically generated public development URLs using Cloudflare Quick Tunnels
+-Automatically generated public development URLs using Cloudflare Quick Tunnels
 
-Technology Stack
+##Technology Stack
 
-React Native — Android mobile application
+-React Native — Android mobile application
 
-Expo Development Build — supports native modules unavailable in Expo Go
+-Expo Development Build — supports native modules unavailable in Expo Go
 
-Expo Router — application navigation
+-Expo Router — application navigation
 
-React Native Agora (react-native-agora) — real-time audio and video communication
+-React Native Agora (react-native-agora) — real-time audio and video communication
 
-Node.js and Express.js — session and token backend
+-Node.js and Express.js — session and token backend
 
 Agora Token Builder (agora-token) — generates RTC access tokens from the App ID and App Certificate
 
