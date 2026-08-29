@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>WalkBuddy Helper</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #090909;
+      color: #ffffff;
+
+      font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      min-height: 100vh;
+    }
+
+    .app {
+      min-height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+
+    .header {
+      min-height: 72px;
+
+      padding: 0 28px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      background: #121212;
+
+      border-bottom:
+        1px solid #272727;
+    }
+
+    .brand-title {
+      font-size: 23px;
+      font-weight: 700;
+    }
+
+    .brand-subtitle {
+      color: #999;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .status {
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 9px 14px;
+
+      background: #202020;
+
+      border-radius: 999px;
+
+      font-size: 14px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+
+      border-radius: 50%;
+
+      background: #777;
+    }
+
+    .status-dot.connected {
+      background: #20c766;
+    }
+
+    .status-dot.error {
+      background: #ef4444;
+    }
+
+    /* MAIN */
+
+    .main {
+      flex: 1;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 22px;
+    }
+
+    .call {
+      position: relative;
+
+      width: 100%;
+      max-width: 1150px;
+
+      height:
+        calc(100vh - 118px);
+
+      min-height: 560px;
+
+      overflow: hidden;
+
+      border-radius: 22px;
+
+      background: #151515;
+
+      box-shadow:
+        0 20px 60px
+        rgba(0, 0, 0, 0.5);
+    }
+
+    /* WALKBuddy VIDEO */
+
+    #remote-player {
+      width: 100%;
+      height: 100%;
+
+      background: #000;
+    }
+
+    .remote-label {
+      position: absolute;
+
+      top: 18px;
+      left: 18px;
+
+      z-index: 4;
+
+      padding: 9px 13px;
+
+      border-radius: 10px;
+
+      background:
+        rgba(0, 0, 0, 0.62);
+
+      backdrop-filter:
+        blur(8px);
+
+      font-weight: 600;
+
+      font-size: 14px;
+    }
+
+    /* WAITING OVERLAY */
+
+    .message-overlay {
+      position: absolute;
+
+      inset: 0;
+
+      z-index: 3;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      padding: 30px;
+
+      background: #151515;
+
+      pointer-events: none;
+    }
+
+    .message-icon {
+      width: 92px;
+      height: 92px;
+
+      border-radius: 50%;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      background: #242424;
+
+      font-size: 42px;
+
+      margin-bottom: 18px;
+    }
+
+    .message-title {
+      font-size: 25px;
+      font-weight: 700;
+
+      margin-bottom: 8px;
+    }
+
+    .message-text {
+      color: #aaa;
+
+      font-size: 16px;
+
+      max-width: 500px;
+
+      line-height: 1.5;
+    }
+
+    /* HELPER SELF VIEW */
+
+    .local-container {
+      position: absolute;
+
+      z-index: 5;
+
+      right: 22px;
+      bottom: 110px;
+
+      width: 220px;
+      height: 150px;
+
+      border-radius: 16px;
+
+      overflow: hidden;
+
+      background: #222;
+
+      border:
+        2px solid
+        rgba(255, 255, 255, 0.18);
+
+      box-shadow:
+        0 10px 35px
+        rgba(0, 0, 0, 0.5);
+    }
+
+    #local-player {
+      width: 100%;
+      height: 100%;
+    }
+
+    .local-label {
+      position: absolute;
+
+      left: 8px;
+      bottom: 7px;
+
+      padding: 5px 8px;
+
+      border-radius: 7px;
+
+      background:
+        rgba(0, 0, 0, 0.65);
+
+      font-size: 11px;
+    }
+
+    /* CONTROLS */
+
+    .controls {
+      position: absolute;
+
+      z-index: 6;
+
+      left: 50%;
+      bottom: 22px;
+
+      transform:
+        translateX(-50%);
+
+      display: flex;
+
+      gap: 22px;
+
+      padding: 13px 21px;
+
+      border-radius: 50px;
+
+      background:
+        rgba(20, 20, 20, 0.88);
+
+      backdrop-filter:
+        blur(14px);
+    }
+
+    .control {
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 5px;
+    }
+
+    .control-button {
+      width: 58px;
+      height: 58px;
+
+      border: none;
+
+      border-radius: 50%;
+
+      background: #383838;
+
+      color: #fff;
+
+      font-size: 25px;
+
+      cursor: pointer;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+    }
+
+    .control-button.active {
+      background: #555;
+    }
+
+    .control-button.end {
+      background: #d32f2f;
+    }
+
+    .control-label {
+      color: #ddd;
+      font-size: 11px;
+    }
+
+    @media (max-width: 700px) {
+      .header {
+        padding: 0 14px;
+      }
+
+      .brand-title {
+        font-size: 18px;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .main {
+        padding: 8px;
+      }
+
+      .call {
+        height:
+          calc(100vh - 90px);
+
+        border-radius: 12px;
+      }
+
+      .local-container {
+        width: 135px;
+        height: 95px;
+
+        right: 12px;
+        bottom: 102px;
+      }
+
+      .controls {
+        gap: 12px;
+
+        padding: 10px 14px;
+
+        bottom: 15px;
+      }
+
+      .control-button {
+        width: 52px;
+        height: 52px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header class="header">
+
+    <div>
+      <div class="brand-title">
+        WalkBuddy Helper
+      </div>
+
+      <div class="brand-subtitle">
+        Remote visual assistance
+      </div>
+    </div>
+
+    <div class="status">
+
+      <div
+        id="statusDot"
+        class="status-dot">
+      </div>
+
+      <span id="statusText">
+        Connecting
+      </span>
+
+    </div>
+
+  </header>
+
+  <main class="main">
+
+    <div class="call">
+
+      <!-- WALKBuddy USER VIDEO -->
+
+      <div id="remote-player"></div>
+
+      <div class="remote-label">
+        WalkBuddy User
+      </div>
+
+      <!-- WAITING -->
+
+      <div
+        id="messageOverlay"
+        class="message-overlay">
+
+        <div
+          id="messageIcon"
+          class="message-icon">
+          ⏳
+        </div>
+
+        <div
+          id="messageTitle"
+          class="message-title">
+          Connecting...
+        </div>
+
+        <div
+          id="messageText"
+          class="message-text">
+          Checking your secure WalkBuddy invitation.
+        </div>
+
+      </div>
+
+      <!-- HELPER SELF VIDEO -->
+
+      <div
+        id="localContainer"
+        class="local-container"
+        style="display:none;">
+
+        <div id="local-player"></div>
+
+        <div class="local-label">
+          You
+        </div>
+
+      </div>
+
+      <!-- CONTROLS -->
+
+      <div
+        id="controls"
+        class="controls"
+        style="display:none;">
+
+        <!-- KEEP MIC -->
+
+        <div class="control">
+
+          <button
+            id="muteButton"
+            class="control-button"
+            onclick="toggleMute()"
+            aria-label="Mute microphone">
+
+            🎙️
+
+          </button>
+
+          <span
+            id="muteLabel"
+            class="control-label">
+
+            Mute
+
+          </span>
+
+        </div>
+
+        <!-- HELPER CAMERA -->
+
+        <div class="control">
+
+          <button
+            id="cameraButton"
+            class="control-button"
+            onclick="switchHelperCamera()"
+            aria-label="Switch helper camera">
+
+            🔄
+
+          </button>
+
+          <span class="control-label">
+            Camera
+          </span>
+
+        </div>
+
+        <!-- KEEP END -->
+
+        <div class="control">
+
+          <button
+            class="control-button end"
+            onclick="leaveCall()"
+            aria-label="Leave assistance call">
+
+            📞
+
+          </button>
+
+          <span class="control-label">
+            End
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script
+  src="https://download.agora.io/sdk/release/AgoraRTC_N-4.23.4.js">
+</script>
+
+<script>
+
+/*
+  ==================================================
+  STATE
+  ==================================================
+*/
+
+let client = null;
+
+let localAudioTrack = null;
+let localVideoTrack = null;
+
+let helperMuted = false;
+
+let currentSession = null;
+
+let remoteUserUid = null;
+
+
+/*
+  ==================================================
+  URL
+  ==================================================
+*/
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const inviteId =
+  params.get("invite");
+
+const apiBase =
+  params.get("api");
+
+const helperStorageKey =
+  inviteId
+    ? `walkbuddy_helper_${inviteId}`
+    : null;
+
+
+/*
+  ==================================================
+  UI
+  ==================================================
+*/
+
+function setStatus(
+  message,
+  mode = "normal"
+) {
+
+  document
+    .getElementById(
+      "statusText"
+    )
+    .innerText =
+      message;
+
+  const dot =
+    document.getElementById(
+      "statusDot"
+    );
+
+  dot.classList.remove(
+    "connected",
+    "error"
+  );
+
+  if (
+    mode === "connected"
+  ) {
+    dot.classList.add(
+      "connected"
+    );
+  }
+
+  if (
+    mode === "error"
+  ) {
+    dot.classList.add(
+      "error"
+    );
+  }
+}
+
+
+function showMessage(
+  icon,
+  title,
+  text
+) {
+
+  const overlay =
+    document.getElementById(
+      "messageOverlay"
+    );
+
+  overlay.style.display =
+    "flex";
+
+  document
+    .getElementById(
+      "messageIcon"
+    )
+    .innerText =
+      icon;
+
+  document
+    .getElementById(
+      "messageTitle"
+    )
+    .innerText =
+      title;
+
+  document
+    .getElementById(
+      "messageText"
+    )
+    .innerText =
+      text;
+}
+
+
+function hideMessage() {
+
+  document
+    .getElementById(
+      "messageOverlay"
+    )
+    .style
+    .display =
+      "none";
+}
+
+
+/*
+  ==================================================
+  CLAIM INVITE
+  ==================================================
+*/
+
+async function claimInvite() {
+
+  if (
+    !inviteId ||
+    !apiBase
+  ) {
+
+    setStatus(
+      "Invalid invitation",
+      "error"
+    );
+
+    showMessage(
+      "⚠️",
+      "Invalid invitation",
+      "This WalkBuddy invitation is incomplete."
+    );
+
+    return null;
+  }
+
+
+  const accessKey =
+    helperStorageKey
+      ? localStorage.getItem(
+          helperStorageKey
+        )
+      : null;
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${apiBase}/api/invites/${encodeURIComponent(
+          inviteId
+        )}/claim`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              accessKey:
+                accessKey || null
+            })
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      if (
+        response.status === 409
+      ) {
+
+        setStatus(
+          "Session full",
+          "error"
+        );
+
+        showMessage(
+          "🔒",
+          "Helper already connected",
+          "This assistance invitation has already been claimed by another device."
+        );
+
+        return null;
+      }
+
+
+      if (
+        response.status === 410
+      ) {
+
+        setStatus(
+          "Session unavailable",
+          "error"
+        );
+
+        showMessage(
+          "⌛",
+          "Session unavailable",
+          result.error ||
+          "This session is no longer available."
+        );
+
+        return null;
+      }
+
+
+      throw new Error(
+        result.error ||
+        `Server returned ${response.status}`
+      );
+    }
+
+
+    if (
+      helperStorageKey &&
+      result.accessKey
+    ) {
+
+      localStorage.setItem(
+        helperStorageKey,
+        result.accessKey
+      );
+    }
+
+
+    return result;
+
+  } catch (error) {
+
+    console.error(
+      "INVITE CLAIM ERROR:",
+      error
+    );
+
+    setStatus(
+      "Connection failed",
+      "error"
+    );
+
+    showMessage(
+      "⚠️",
+      "Unable to join",
+      error.message ||
+      String(error)
+    );
+
+    return null;
+  }
+}
+
+
+/*
+  ==================================================
+  SUBSCRIBE TO WALKBuddy USER
+  ==================================================
+*/
+
+async function subscribeToRemoteUser(
+  user,
+  mediaType
+) {
+
+  try {
+
+    console.log(
+      "REMOTE PUBLISHED:",
+      user.uid,
+      mediaType
+    );
+
+
+    await client.subscribe(
+      user,
+      mediaType
+    );
+
+
+    console.log(
+      "SUBSCRIBED:",
+      user.uid,
+      mediaType
+    );
+
+
+    remoteUserUid =
+      user.uid;
+
+
+    if (
+      mediaType === "video"
+    ) {
+
+      if (
+        user.videoTrack
+      ) {
+
+        console.log(
+          "PLAYING REMOTE VIDEO:",
+          user.uid
+        );
+
+
+        /*
+          Clear previous remote player.
+        */
+
+        document
+          .getElementById(
+            "remote-player"
+          )
+          .innerHTML =
+            "";
+
+
+        user.videoTrack.play(
+          "remote-player",
+          {
+            fit: "contain"
+          }
+        );
+
+
+        hideMessage();
+
+
+        setStatus(
+          "Connected",
+          "connected"
+        );
+      }
+    }
+
+
+    if (
+      mediaType === "audio"
+    ) {
+
+      if (
+        user.audioTrack
+      ) {
+
+        console.log(
+          "PLAYING REMOTE AUDIO:",
+          user.uid
+        );
+
+
+        user.audioTrack.play();
+
+
+        setStatus(
+          "Connected",
+          "connected"
+        );
+      }
+    }
+
+  } catch (error) {
+
+    console.error(
+      "SUBSCRIBE ERROR:",
+      error
+    );
+  }
+}
+
+
+/*
+  ==================================================
+  START CALL
+  ==================================================
+*/
+
+async function startCall() {
+
+  setStatus(
+    "Checking invitation"
+  );
+
+
+  showMessage(
+    "⏳",
+    "Connecting...",
+    "Checking your secure WalkBuddy invitation."
+  );
+
+
+  const session =
+    await claimInvite();
+
+
+  if (!session) {
+    return;
+  }
+
+
+  currentSession =
+    session;
+
+
+  try {
+
+    console.log(
+      "SECURE SESSION:",
+      session.sessionId
+    );
+
+    console.log(
+      "AGORA CHANNEL:",
+      session.channelName
+    );
+
+    console.log(
+      "HELPER UID:",
+      session.uid
+    );
+
+
+    setStatus(
+      "Joining call"
+    );
+
+
+    client =
+      AgoraRTC.createClient({
+        mode: "rtc",
+        codec: "vp8"
+      });
+
+
+    /*
+      Register handlers BEFORE joining.
+    */
+
+    client.on(
+      "user-published",
+      subscribeToRemoteUser
+    );
+
+
+    client.on(
+      "user-unpublished",
+      (
+        user,
+        mediaType
+      ) => {
+
+        console.log(
+          "REMOTE UNPUBLISHED:",
+          user.uid,
+          mediaType
+        );
+
+
+        if (
+          mediaType ===
+          "video"
+        ) {
+
+          showMessage(
+            "📷",
+            "Camera unavailable",
+            "The WalkBuddy user's camera is currently unavailable."
+          );
+        }
+      }
+    );
+
+
+    client.on(
+      "user-left",
+      (user) => {
+
+        console.log(
+          "WalkBuddy user left:",
+          user.uid
+        );
+
+
+        remoteUserUid =
+          null;
+
+
+        setStatus(
+          "User disconnected"
+        );
+
+
+        showMessage(
+          "👤",
+          "WalkBuddy user disconnected",
+          "Waiting for the WalkBuddy user to reconnect."
+        );
+      }
+    );
+
+
+    /*
+      Join Agora.
+    */
+
+    await client.join(
+      session.appId,
+      session.channelName,
+      session.token,
+      session.uid
+    );
+
+
+    console.log(
+      "HELPER JOIN SUCCESS"
+    );
+
+
+    /*
+      Inspect any remote participants
+      already present in the channel.
+
+      This is the important addition.
+
+      If Android joined and published BEFORE
+      the browser registered user-published,
+      we manually inspect the remoteUsers list.
+    */
+
+    console.log(
+      "REMOTE USERS AFTER JOIN:",
+      client.remoteUsers.map(
+        user => user.uid
+      )
+    );
+
+
+    for (
+      const user of
+      client.remoteUsers
+    ) {
+
+      /*
+        Agora's remote user object tells us
+        whether audio/video is already published.
+      */
+
+      if (
+        user.hasVideo
+      ) {
+
+        await subscribeToRemoteUser(
+          user,
+          "video"
+        );
+      }
+
+
+      if (
+        user.hasAudio
+      ) {
+
+        await subscribeToRemoteUser(
+          user,
+          "audio"
+        );
+      }
+    }
+
+
+    /*
+      Helper camera + microphone.
+    */
+
+    [
+      localAudioTrack,
+      localVideoTrack
+    ] =
+      await AgoraRTC
+        .createMicrophoneAndCameraTracks();
+
+
+    localVideoTrack.play(
+      "local-player",
+      {
+        fit: "cover"
+      }
+    );
+
+
+    await client.publish([
+      localAudioTrack,
+      localVideoTrack
+    ]);
+
+
+    console.log(
+      "HELPER MEDIA PUBLISHED"
+    );
+
+
+    document
+      .getElementById(
+        "localContainer"
+      )
+      .style
+      .display =
+        "block";
+
+
+    document
+      .getElementById(
+        "controls"
+      )
+      .style
+      .display =
+        "flex";
+
+
+    /*
+      Only show waiting screen if
+      Android genuinely isn't present.
+    */
+
+    if (
+      client.remoteUsers.length === 0
+    ) {
+
+      setStatus(
+        "Waiting for WalkBuddy user"
+      );
+
+
+      showMessage(
+        "👤",
+        "Connected to session",
+        "Waiting for the WalkBuddy user's camera."
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "AGORA JOIN ERROR:",
+      error
+    );
+
+
+    setStatus(
+      "Call failed",
+      "error"
+    );
+
+
+    showMessage(
+      "⚠️",
+      "Unable to start call",
+      error.message ||
+      String(error)
+    );
+  }
+}
+
+
+/*
+  ==================================================
+  MUTE
+  KEEP THIS BEHAVIOUR
+  ==================================================
+*/
+
+async function toggleMute() {
+
+  if (
+    !localAudioTrack
+  ) {
+    return;
+  }
+
+
+  helperMuted =
+    !helperMuted;
+
+
+  await localAudioTrack
+    .setEnabled(
+      !helperMuted
+    );
+
+
+  const button =
+    document.getElementById(
+      "muteButton"
+    );
+
+
+  const label =
+    document.getElementById(
+      "muteLabel"
+    );
+
+
+  if (
+    helperMuted
+  ) {
+
+    button.innerText =
+      "🔇";
+
+
+    button.classList.add(
+      "active"
+    );
+
+
+    button.setAttribute(
+      "aria-label",
+      "Unmute microphone"
+    );
+
+
+    label.innerText =
+      "Unmute";
+
+  } else {
+
+    button.innerText =
+      "🎙️";
+
+
+    button.classList.remove(
+      "active"
+    );
+
+
+    button.setAttribute(
+      "aria-label",
+      "Mute microphone"
+    );
+
+
+    label.innerText =
+      "Mute";
+  }
+}
+
+
+/*
+  ==================================================
+  SWITCH HELPER'S OWN CAMERA
+  ==================================================
+
+  This does NOT control Android.
+
+  On a desktop with only one webcam,
+  nothing will change.
+*/
+
+async function switchHelperCamera() {
+
+  if (
+    !localVideoTrack
+  ) {
+    return;
+  }
+
+
+  try {
+
+    const cameras =
+      await AgoraRTC.getCameras();
+
+
+    console.log(
+      "AVAILABLE HELPER CAMERAS:",
+      cameras.length
+    );
+
+
+    if (
+      cameras.length < 2
+    ) {
+
+      console.log(
+        "Only one helper camera available."
+      );
+
+      return;
+    }
+
+
+    const currentLabel =
+      localVideoTrack
+        .getTrackLabel();
+
+
+    let nextCamera =
+      cameras.find(
+        camera =>
+          camera.label !==
+          currentLabel
+      );
+
+
+    if (
+      !nextCamera
+    ) {
+
+      nextCamera =
+        cameras[0];
+    }
+
+
+    await localVideoTrack
+      .setDevice(
+        nextCamera.deviceId
+      );
+
+
+    console.log(
+      "HELPER CAMERA SWITCHED"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "CAMERA SWITCH ERROR:",
+      error
+    );
+  }
+}
+
+
+/*
+  ==================================================
+  END
+  KEEP THIS BEHAVIOUR
+  ==================================================
+*/
+
+async function leaveCall() {
+
+  try {
+
+    if (
+      localAudioTrack
+    ) {
+
+      localAudioTrack.stop();
+
+      localAudioTrack.close();
+
+      localAudioTrack =
+        null;
+    }
+
+
+    if (
+      localVideoTrack
+    ) {
+
+      localVideoTrack.stop();
+
+      localVideoTrack.close();
+
+      localVideoTrack =
+        null;
+    }
+
+
+    if (
+      client
+    ) {
+
+      await client.leave();
+
+      client =
+        null;
+    }
+
+
+    helperMuted =
+      false;
+
+
+    document
+      .getElementById(
+        "localContainer"
+      )
+      .style
+      .display =
+        "none";
+
+
+    document
+      .getElementById(
+        "controls"
+      )
+      .style
+      .display =
+        "none";
+
+
+    setStatus(
+      "Call ended"
+    );
+
+
+    showMessage(
+      "✓",
+      "You left the call",
+      "Refresh this page to reconnect while the WalkBuddy session remains active."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "LEAVE ERROR:",
+      error
+    );
+  }
+}
+
+
+/*
+  ==================================================
+  START
+  ==================================================
+*/
+
+startCall();
+
+</script>
+
+</body>
+</html>

@@ -23,7 +23,6 @@ const PROJECT_DIRECTORY =
 const ROOT_DIRECTORY =
   path.resolve(
     PROJECT_DIRECTORY,
-    '..',
     '..'
   );
 
@@ -52,7 +51,6 @@ const LOCAL_CLOUDFLARED =
       ? 'cloudflared.exe'
       : 'cloudflared'
   );
-
 
 /*
   ==================================================
@@ -626,6 +624,32 @@ function startExpo(
     '========================================\n'
   );
 
+  /*
+    Save the dynamically generated Cloudflare
+    URLs where Expo can load them during bundling.
+  */
+
+  const environmentFile =
+    path.join(
+      PROJECT_DIRECTORY,
+      '.env.local'
+    );
+
+  const environmentContents = [
+    `EXPO_PUBLIC_BACKEND_URL=${backendUrl}`,
+    `EXPO_PUBLIC_HELPER_PAGE_URL=${helperUrl}`,
+    '',
+  ].join('\n');
+
+  fs.writeFileSync(
+    environmentFile,
+    environmentContents,
+    'utf8'
+  );
+
+  console.log(
+    '✓ Expo environment configuration created'
+  );
 
   startProcess(
     'Expo',
@@ -650,15 +674,14 @@ function startExpo(
         ...process.env,
 
         EXPO_PUBLIC_BACKEND_URL:
-          backendUrl,
+          String(backendUrl),
 
         EXPO_PUBLIC_HELPER_PAGE_URL:
-          helperUrl,
+          String(helperUrl),
       },
     }
   );
 }
-
 
 /*
   ==================================================
